@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>平家物語 ― 現代語訳と鑑賞</title>
+  <meta name="description" content="平家物語の現代語訳・古語解説・読み物を提供する古典学習サイトです。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Shippori+Mincho:wght@400;600;800&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --moegi:       #5a7a4a;   /* 萌葱 */
+      --moegi-light: #8aaa72;
+      --moegi-pale:  #c8dbb8;
+      --moegi-deep:  #3a5230;
+      --usuyuki:     #f0f4ec;   /* 薄雪 */
+      --kincha:      #b89050;   /* 金茶 */
+      --benihi:      #c04040;   /* 紅緋 — アクセント */
+      --sumi:        #1a1a14;   /* 墨 */
+      --koke:        #2e3e28;   /* 苔 */
+
+      --font-serif-jp: 'Shippori Mincho', 'Noto Serif JP', serif;
+      --font-en:       'Cinzel', serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--koke);
+      color: var(--usuyuki);
+      font-family: var(--font-serif-jp);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── 和紙テクスチャ背景 ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ══════════ HEADER / NAV ══════════ */
+    header {
+      position: relative;
+      z-index: 10;
+      border-bottom: 1px solid rgba(90,122,74,0.4);
+      padding: 0 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      background: rgba(30,42,24,0.85);
+      backdrop-filter: blur(8px);
+    }
+
+    .site-name {
+      font-family: var(--font-serif-jp);
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: 0.3em;
+      color: var(--moegi-pale);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .site-name span {
+      color: var(--kincha);
+      font-size: 0.75em;
+      display: block;
+      letter-spacing: 0.25em;
+      font-weight: 400;
+      font-family: var(--font-en);
+    }
+
+    nav {
+      display: flex;
+      gap: 2.2rem;
+      align-items: center;
+    }
+    nav a {
+      color: var(--moegi-pale);
+      text-decoration: none;
+      font-size: 0.82rem;
+      letter-spacing: 0.25em;
+      position: relative;
+      transition: color 0.2s;
+    }
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0; right: 0;
+      height: 1px;
+      background: var(--kincha);
+      transform: scaleX(0);
+      transition: transform 0.25s ease;
+    }
+    nav a:hover { color: var(--kincha); }
+    nav a:hover::after { transform: scaleX(1); }
+    nav a.active { color: var(--kincha); }
+
+    /* ══════════ HERO ══════════ */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 92vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+
+    /* 左：縦書きタイトルエリア */
+    .hero-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 6rem 4rem 6rem 6rem;
+      position: relative;
+    }
+
+    .hero-kana {
+      font-size: 0.72rem;
+      letter-spacing: 0.5em;
+      color: var(--moegi-light);
+      margin-bottom: 1.5rem;
+      font-weight: 300;
+    }
+
+    /* 縦書きタイトル */
+    .hero-title {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-size: clamp(3.5rem, 6vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: 0.12em;
+      color: var(--moegi-pale);
+      margin-bottom: 3rem;
+      position: relative;
+    }
+    .hero-title::before {
+      content: attr(data-en);
+      writing-mode: horizontal-tb;
+      font-family: var(--font-en);
+      font-size: 0.28em;
+      font-weight: 400;
+      color: var(--kincha);
+      letter-spacing: 0.3em;
+      display: block;
+      margin-bottom: 0.8em;
+    }
+
+    .hero-quote {
+      font-size: 0.88rem;
+      line-height: 2.4;
+      letter-spacing: 0.1em;
+      color: rgba(200,219,184,0.75);
+      border-left: 2px solid var(--moegi);
+      padding-left: 1.5rem;
+      max-width: 340px;
+      font-weight: 300;
+    }
+    .hero-quote em {
+      display: block;
+      font-style: normal;
+      font-size: 0.78rem;
+      color: var(--kincha);
+      margin-top: 0.8rem;
+      letter-spacing: 0.2em;
+    }
+
+    .hero-cta {
+      display: inline-block;
+      margin-top: 2.5rem;
+      padding: 0.75rem 2.5rem;
+      border: 1px solid var(--moegi);
+      color: var(--moegi-pale);
+      text-decoration: none;
+      font-size: 0.8rem;
+      letter-spacing: 0.4em;
+      transition: background 0.25s, color 0.25s;
+    }
+    .hero-cta:hover {
+      background: var(--moegi);
+      color: var(--sumi);
+    }
+
+    /* 右：装飾エリア */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* 波紋円 */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(90,122,74,0.3);
+      animation: ripple-expand 6s ease-in-out infinite;
+    }
+    .ripple:nth-child(1) { width: 300px; height: 300px; animation-delay: 0s; }
+    .ripple:nth-child(2) { width: 500px; height: 500px; animation-delay: 2s; }
+    .ripple:nth-child(3) { width: 700px; height: 700px; animation-delay: 4s; }
+    @keyframes ripple-expand {
+      0%   { opacity: 0.6; transform: scale(0.95); }
+      50%  { opacity: 0.2; transform: scale(1.02); }
+      100% { opacity: 0.6; transform: scale(0.95); }
+    }
+
+    /* 中央の家紋風SVG */
+    .kamon {
+      position: relative;
+      z-index: 2;
+      width: 220px;
+      height: 220px;
+      opacity: 0.85;
+      animation: kamon-float 8s ease-in-out infinite;
+    }
+    @keyframes kamon-float {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-12px); }
+    }
+
+    /* 右側縦書き装飾テキスト */
+    .deco-text {
+      position: absolute;
+      right: 3rem;
+      top: 50%;
+      transform: translateY(-50%);
+      writing-mode: vertical-rl;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      color: rgba(90,122,74,0.35);
+      font-weight: 300;
+      line-height: 1;
+    }
+    .deco-text-left {
+      position: absolute;
+      left: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      writing-mode: vertical-rl;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      color: rgba(90,122,74,0.25);
+      font-weight: 300;
+    }
+
+    /* ══════════ SECTION 共通 ══════════ */
+    section {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-label {
+      font-family: var(--font-en);
+      font-size: 0.65rem;
+      letter-spacing: 0.5em;
+      color: var(--moegi-light);
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+    .section-title {
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      color: var(--moegi-pale);
+      margin-bottom: 2.5rem;
+    }
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--kincha);
+      margin-top: 0.8rem;
+    }
+
+    /* ══════════ ABOUT STRIP ══════════ */
+    .about-strip {
+      padding: 5rem 6rem;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 5rem;
+      align-items: start;
+      border-top: 1px solid rgba(90,122,74,0.2);
+      border-bottom: 1px solid rgba(90,122,74,0.2);
+      background: rgba(20,30,16,0.5);
+    }
+
+    .about-strip p {
+      font-size: 0.9rem;
+      line-height: 2.5;
+      color: rgba(200,219,184,0.8);
+      letter-spacing: 0.05em;
+    }
+    .about-strip p + p { margin-top: 1.2rem; }
+
+    /* ══════════ TRANSLATION CARDS ══════════ */
+    .translation-section {
+      padding: 5rem 6rem;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: rgba(30,44,24,0.7);
+      border: 1px solid rgba(90,122,74,0.25);
+      padding: 2rem 1.8rem;
+      transition: border-color 0.3s, transform 0.3s, background 0.3s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: block;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px;
+      height: 0;
+      background: var(--moegi);
+      transition: height 0.3s ease;
+    }
+    .card:hover::before { height: 100%; }
+    .card:hover {
+      border-color: rgba(90,122,74,0.7);
+      transform: translateY(-4px);
+      background: rgba(40,58,30,0.85);
+    }
+
+    .card-num {
+      font-family: var(--font-en);
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      color: var(--moegi);
+      margin-bottom: 0.8rem;
+    }
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--moegi-pale);
+      margin-bottom: 0.5rem;
+    }
+    .card-sub {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: var(--kincha);
+      margin-bottom: 1.2rem;
+      font-weight: 400;
+    }
+    .card-excerpt {
+      font-size: 0.82rem;
+      line-height: 2.2;
+      color: rgba(200,219,184,0.65);
+    }
+    .card-tag {
+      display: inline-block;
+      margin-top: 1.2rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      padding: 0.25rem 0.8rem;
+      border: 1px solid rgba(90,122,74,0.35);
+      color: var(--moegi-light);
+    }
+
+    /* ══════════ BLOG PREVIEW ══════════ */
+    .blog-section {
+      padding: 5rem 6rem;
+      background: rgba(20,30,16,0.4);
+      border-top: 1px solid rgba(90,122,74,0.2);
+    }
+
+    .blog-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .blog-list li {
+      display: grid;
+      grid-template-columns: 120px 1fr auto;
+      align-items: center;
+      gap: 2rem;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid rgba(90,122,74,0.15);
+      transition: padding-left 0.2s;
+    }
+    .blog-list li:hover {
+      padding-left: 0.5rem;
+    }
+    .blog-list li:hover .blog-link { color: var(--kincha); }
+
+    .blog-date {
+      font-family: var(--font-en);
+      font-size: 0.7rem;
+      color: var(--moegi);
+      letter-spacing: 0.2em;
+      white-space: nowrap;
+    }
+    .blog-link {
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      color: var(--moegi-pale);
+      text-decoration: none;
+      transition: color 0.2s;
+      display: block;
+    }
+    .blog-cat {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      padding: 0.2rem 0.7rem;
+      border: 1px solid rgba(184,144,80,0.4);
+      color: var(--kincha);
+      white-space: nowrap;
+    }
+
+    /* ══════════ FOOTER ══════════ */
+    footer {
+      position: relative;
+      z-index: 1;
+      padding: 3rem 6rem;
+      border-top: 1px solid rgba(90,122,74,0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15,22,12,0.8);
+    }
+    .footer-name {
+      font-family: var(--font-serif-jp);
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      color: var(--moegi-pale);
+    }
+    .footer-copy {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: rgba(90,122,74,0.5);
+      font-family: var(--font-en);
+    }
+    .footer-links {
+      display: flex;
+      gap: 1.8rem;
+    }
+    .footer-links a {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: rgba(90,122,74,0.7);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--kincha); }
+
+    /* ── ページ入場アニメ ── */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-text > * {
+      opacity: 0;
+      animation: fade-up 0.9s ease forwards;
+    }
+    .hero-kana   { animation-delay: 0.1s; }
+    .hero-title  { animation-delay: 0.3s; }
+    .hero-quote  { animation-delay: 0.55s; }
+    .hero-cta    { animation-delay: 0.75s; }
+
+    /* ── レスポンシブ ── */
+    @media (max-width: 900px) {
+      header { padding: 0 1.5rem; }
+      nav { gap: 1.2rem; }
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-text { padding: 4rem 2rem 3rem; }
+      .hero-visual { min-height: 280px; }
+      .about-strip,
+      .translation-section,
+      .blog-section { padding: 3rem 2rem; }
+      .about-strip { grid-template-columns: 1fr; gap: 2rem; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .blog-list li { grid-template-columns: 90px 1fr; }
+      .blog-cat { display: none; }
+      footer { flex-direction: column; gap: 1rem; padding: 2rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HEADER ══ -->
+  <header>
+    <a class="site-name" href="index.html">
+      平家物語<span>The Tale of the Heike</span>
+    </a>
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="translation.html">現代語訳</a>
+      <a href="blog.html">読み物</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+
+  <!-- ══ HERO ══ -->
+  <section class="hero">
+    <div class="hero-text">
+      <p class="hero-kana">― へいけものがたり ―</p>
+      <h1 class="hero-title" data-en="The Tale of the Heike">平家物語</h1>
+      <blockquote class="hero-quote">
+        祇園精舎の鐘の声、諸行無常の響きあり。<br>
+        沙羅双樹の花の色、盛者必衰の理をあらはす。
+        <em>— 冒頭、巻第一「祇園精舎」</em>
+      </blockquote>
+      <a class="hero-cta" href="translation.html">現代語訳を読む →</a>
+    </div>
+
+    <div class="hero-visual">
+      <div class="ripple"></div>
+      <div class="ripple"></div>
+      <div class="ripple"></div>
+
+      <!-- 揚羽蝶紋（平家家紋）風SVG -->
+      <svg class="kamon" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="g1" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#8aaa72" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#3a5230" stop-opacity="0.4"/>
+          </radialGradient>
+        </defs>
+        <!-- 外円 -->
+        <circle cx="100" cy="100" r="90" fill="none" stroke="#5a7a4a" stroke-width="1.5" opacity="0.6"/>
+        <circle cx="100" cy="100" r="82" fill="none" stroke="#5a7a4a" stroke-width="0.5" opacity="0.3"/>
+        <!-- 揚羽蝶 簡略版 -->
+        <!-- 左翅 -->
+        <path d="M100,100 C80,60 40,50 35,80 C30,105 60,115 100,100Z"
+              fill="url(#g1)" opacity="0.7"/>
+        <path d="M100,100 C70,90 45,110 55,130 C65,148 90,140 100,100Z"
+              fill="url(#g1)" opacity="0.6"/>
+        <!-- 右翅 -->
+        <path d="M100,100 C120,60 160,50 165,80 C170,105 140,115 100,100Z"
+              fill="url(#g1)" opacity="0.7"/>
+        <path d="M100,100 C130,90 155,110 145,130 C135,148 110,140 100,100Z"
+              fill="url(#g1)" opacity="0.6"/>
+        <!-- 胴 -->
+        <ellipse cx="100" cy="100" rx="5" ry="18" fill="#b89050" opacity="0.8"/>
+        <!-- 触角 -->
+        <line x1="97" y1="83" x2="88" y2="68" stroke="#8aaa72" stroke-width="1" opacity="0.6"/>
+        <line x1="103" y1="83" x2="112" y2="68" stroke="#8aaa72" stroke-width="1" opacity="0.6"/>
+        <circle cx="88" cy="67" r="2" fill="#b89050" opacity="0.7"/>
+        <circle cx="112" cy="67" r="2" fill="#b89050" opacity="0.7"/>
+      </svg>
+
+      <p class="deco-text">諸行無常　盛者必衰　おごれる人も久しからず</p>
+      <p class="deco-text-left">源平合戦　壇ノ浦</p>
+    </div>
+  </section>
+
+  <!-- ══ ABOUT STRIP ══ -->
+  <section class="about-strip">
+    <div>
+      <p class="section-label">About This Site</p>
+      <h2 class="section-title">このサイトについて</h2>
+    </div>
+    <div>
+      <p>『平家物語』は、平安末期から鎌倉初期にかけての源平合戦を題材とした軍記物語です。「祇園精舎の鐘の声……」という冒頭の一節はあまりにも有名で、無常観という日本文学の根幹をなすテーマを見事に表現しています。</p>
+      <p>このサイトでは、難解な古文を現代語に丁寧に訳し、語句解説や背景知識とあわせて紹介します。受験勉強のためはもちろん、日本の古典の魅力を純粋に楽しみたい方のための読み物としてもお役立てください。</p>
+    </div>
+  </section>
+
+  <!-- ══ TRANSLATION CARDS ══ -->
+  <section class="translation-section">
+    <p class="section-label">Translation</p>
+    <h2 class="section-title">現代語訳 — 人気の章段</h2>
+
+    <div class="cards-grid">
+      <a class="card" href="translation.html#gionshoja">
+        <p class="card-num">巻第一 — 01</p>
+        <h3 class="card-title">祇園精舎</h3>
+        <p class="card-sub">Gion Shōja</p>
+        <p class="card-excerpt">祇園精舎の鐘の声、諸行無常の響きあり――。物語の幕開け、無常の哲学が凝縮された有名な冒頭段。</p>
+        <span class="card-tag">無常観</span>
+      </a>
+
+      <a class="card" href="translation.html#nasu">
+        <p class="card-num">巻第十一 — 04</p>
+        <h3 class="card-title">那須与一</h3>
+        <p class="card-sub">Nasu no Yoichi</p>
+        <p class="card-excerpt">屋島の合戦。海上に掲げられた扇を射落とせという平家の挑発に、那須与一が応える一射必中の場面。</p>
+        <span class="card-tag">弓道・武士道</span>
+      </a>
+
+      <a class="card" href="translation.html#atsumori">
+        <p class="card-num">巻第九 — 16</p>
+        <h3 class="card-title">敦盛の最期</h3>
+        <p class="card-sub">The Death of Atsumori</p>
+        <p class="card-excerpt">若武者・平敦盛と熊谷直実の一騎打ち。戦場における生死と情愛が交錯する、物語屈指の名場面。</p>
+        <span class="card-tag">無常・情愛</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ══ BLOG PREVIEW ══ -->
+  <section class="blog-section">
+    <p class="section-label">Blog</p>
+    <h2 class="section-title">読み物</h2>
+
+    <ul class="blog-list">
+      <li>
+        <span class="blog-date">2025 · 06 · 01</span>
+        <a class="blog-link" href="blog.html#01">「諸行無常」とはなにか ― 仏教思想と平家物語の接点</a>
+        <span class="blog-cat">解説</span>
+      </li>
+      <li>
+        <span class="blog-date">2025 · 05 · 20</span>
+        <a class="blog-link" href="blog.html#02">源平合戦の地図で読む平家物語 ― 壇ノ浦まで</a>
+        <span class="blog-cat">地理・歴史</span>
+      </li>
+      <li>
+        <span class="blog-date">2025 · 05 · 08</span>
+        <a class="blog-link" href="blog.html#03">琵琶法師と語り伝え ― 平家物語の成立について</a>
+        <span class="blog-cat">文学史</span>
+      </li>
+      <li>
+        <span class="blog-date">2025 · 04 · 15</span>
+        <a class="blog-link" href="blog.html#04">那須与一の「扇の的」― 古語と技法を読み解く</a>
+        <span class="blog-cat">古語解説</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <p class="footer-name">平家物語 現代語訳サイト</p>
+    <nav class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="translation.html">現代語訳</a>
+      <a href="blog.html">読み物</a>
+      <a href="about.html">About</a>
+    </nav>
+    <p class="footer-copy">&copy; 2025 Heike Monogatari Study Site</p>
+  </footer>
+
+</body>
+</html>
