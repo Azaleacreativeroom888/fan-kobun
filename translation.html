@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>現代語訳 ― 平家物語</title>
+  <meta name="description" content="平家物語の原文・現代語訳・解釈を章段ごとに掲載しています。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Shippori+Mincho:wght@400;600;800&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --moegi:       #5a7a4a;
+      --moegi-light: #8aaa72;
+      --moegi-pale:  #c8dbb8;
+      --moegi-deep:  #3a5230;
+      --usuyuki:     #f0f4ec;
+      --kincha:      #b89050;
+      --kincha-pale: rgba(184,144,80,0.15);
+      --sumi:        #1a1a14;
+      --koke:        #2e3e28;
+      --bg-card:     rgba(28,40,22,0.75);
+      --border:      rgba(90,122,74,0.25);
+
+      --font-jp:  'Shippori Mincho', 'Noto Serif JP', serif;
+      --font-en:  'Cinzel', serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--koke);
+      color: var(--usuyuki);
+      font-family: var(--font-jp);
+      min-height: 100vh;
+    }
+
+    /* 和紙ノイズ */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ══ HEADER ══ */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 3rem;
+      background: rgba(22,32,18,0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .site-name {
+      font-family: var(--font-jp);
+      font-weight: 800; font-size: 1.1rem;
+      letter-spacing: 0.3em; color: var(--moegi-pale);
+      text-decoration: none;
+    }
+    .site-name span {
+      font-family: var(--font-en); font-weight: 400;
+      font-size: 0.62em; color: var(--kincha);
+      display: block; letter-spacing: 0.3em;
+    }
+    nav { display: flex; gap: 2rem; }
+    nav a {
+      color: var(--moegi-pale); text-decoration: none;
+      font-size: 0.8rem; letter-spacing: 0.25em;
+      position: relative; transition: color 0.2s;
+    }
+    nav a::after {
+      content: ''; position: absolute;
+      bottom: -4px; left: 0; right: 0; height: 1px;
+      background: var(--kincha); transform: scaleX(0);
+      transition: transform 0.25s;
+    }
+    nav a:hover { color: var(--kincha); }
+    nav a:hover::after { transform: scaleX(1); }
+    nav a.active { color: var(--kincha); }
+
+    /* ══ PAGE HEADER ══ */
+    .page-header {
+      position: relative; z-index: 1;
+      padding: 4.5rem 5rem 3rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-end; justify-content: space-between;
+    }
+    .page-header-left {}
+    .page-en {
+      font-family: var(--font-en); font-size: 0.65rem;
+      letter-spacing: 0.5em; color: var(--moegi);
+      margin-bottom: 0.5rem;
+    }
+    .page-title {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 800; letter-spacing: 0.25em;
+      color: var(--moegi-pale);
+      line-height: 1.2;
+    }
+    .page-desc {
+      margin-top: 1rem; font-size: 0.82rem;
+      line-height: 2.2; letter-spacing: 0.06em;
+      color: rgba(200,219,184,0.65); max-width: 460px;
+    }
+
+    /* 凡例バッジ */
+    .legend {
+      display: flex; flex-direction: column; gap: 0.6rem;
+      align-items: flex-end;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 0.7rem;
+      font-size: 0.7rem; letter-spacing: 0.2em;
+      color: rgba(200,219,184,0.55);
+    }
+    .legend-bar {
+      width: 24px; height: 3px; border-radius: 2px;
+    }
+    .lb-genbun  { background: var(--moegi-light); }
+    .lb-gendai  { background: var(--kincha); }
+    .lb-kaishaku{ background: rgba(192,64,64,0.7); }
+
+    /* ══ MAIN LAYOUT ══ */
+    .main-wrap {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 0;
+      min-height: calc(100vh - 64px);
+    }
+
+    /* ── サイドバー（章段ナビ） ── */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 2.5rem 0;
+      position: sticky; top: 64px;
+      height: calc(100vh - 64px);
+      overflow-y: auto;
+      background: rgba(20,30,16,0.5);
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--moegi-deep); border-radius: 2px; }
+
+    .sidebar-section {
+      padding: 0 1.5rem;
+      margin-bottom: 1.8rem;
+    }
+    .sidebar-label {
+      font-family: var(--font-en); font-size: 0.58rem;
+      letter-spacing: 0.4em; color: var(--moegi);
+      text-transform: uppercase; margin-bottom: 0.7rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-link {
+      display: block; padding: 0.45rem 0.6rem;
+      font-size: 0.78rem; letter-spacing: 0.1em;
+      color: rgba(200,219,184,0.6);
+      text-decoration: none;
+      border-radius: 2px;
+      transition: color 0.2s, background 0.2s, padding-left 0.2s;
+      line-height: 1.6;
+    }
+    .sidebar-link:hover {
+      color: var(--moegi-pale);
+      background: rgba(90,122,74,0.12);
+      padding-left: 1rem;
+    }
+    .sidebar-link.current {
+      color: var(--kincha);
+      background: var(--kincha-pale);
+    }
+    .sidebar-link .link-num {
+      font-family: var(--font-en); font-size: 0.6em;
+      color: var(--moegi); margin-right: 0.4em;
+    }
+
+    /* ── メインコンテンツ ── */
+    .content {
+      padding: 3rem 5rem 6rem 4rem;
+      max-width: 860px;
+    }
+
+    /* ══ エントリー ══ */
+    .entry {
+      margin-bottom: 4.5rem;
+      padding-bottom: 4rem;
+      border-bottom: 1px solid var(--border);
+      animation: fade-up 0.6s ease both;
+    }
+    .entry:last-child { border-bottom: none; }
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* エントリーヘッダ */
+    .entry-header {
+      display: flex; align-items: baseline;
+      gap: 1.5rem; margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .entry-num {
+      font-family: var(--font-en); font-size: 0.62rem;
+      letter-spacing: 0.4em; color: var(--moegi);
+    }
+    .entry-title {
+      font-size: 1.35rem; font-weight: 800;
+      letter-spacing: 0.2em; color: var(--moegi-pale);
+    }
+    .entry-sub {
+      font-family: var(--font-en); font-size: 0.72rem;
+      letter-spacing: 0.2em; color: var(--kincha);
+      font-weight: 400;
+    }
+    .entry-date {
+      margin-left: auto;
+      font-family: var(--font-en); font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: rgba(90,122,74,0.55);
+      white-space: nowrap;
+    }
+
+    /* ── ブロック共通 ── */
+    .block {
+      margin-bottom: 1.4rem;
+      border-left: 3px solid transparent;
+      padding: 1.4rem 1.6rem 1.4rem 1.8rem;
+      background: var(--bg-card);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .block-label {
+      font-family: var(--font-en); font-size: 0.58rem;
+      letter-spacing: 0.45em; text-transform: uppercase;
+      margin-bottom: 0.9rem; display: flex;
+      align-items: center; gap: 0.6rem;
+    }
+    .block-label::after {
+      content: ''; flex: 1; height: 1px;
+      background: currentColor; opacity: 0.2;
+    }
+
+    /* 原文 */
+    .block-genbun {
+      border-left-color: var(--moegi-light);
+      background: rgba(90,122,74,0.08);
+    }
+    .block-genbun .block-label { color: var(--moegi-light); }
+    .block-genbun .block-body {
+      font-size: 1rem; line-height: 2.6;
+      letter-spacing: 0.1em;
+      color: rgba(200,219,184,0.9);
+    }
+
+    /* 現代語訳 */
+    .block-gendai {
+      border-left-color: var(--kincha);
+      background: rgba(184,144,80,0.07);
+    }
+    .block-gendai .block-label { color: var(--kincha); }
+    .block-gendai .block-body {
+      font-size: 0.92rem; line-height: 2.5;
+      letter-spacing: 0.06em;
+      color: rgba(240,244,236,0.85);
+    }
+
+    /* 解釈・メモ */
+    .block-kaishaku {
+      border-left-color: rgba(192,64,64,0.65);
+      background: rgba(192,64,64,0.06);
+    }
+    .block-kaishaku .block-label { color: rgba(210,100,100,0.9); }
+    .block-kaishaku .block-body {
+      font-size: 0.85rem; line-height: 2.4;
+      letter-spacing: 0.06em;
+      color: rgba(240,244,236,0.72);
+    }
+
+    /* 語句メモ（オプション） */
+    .vocab {
+      margin-top: 1rem;
+      display: flex; flex-wrap: wrap; gap: 0.6rem;
+    }
+    .vocab-item {
+      font-size: 0.72rem; letter-spacing: 0.1em;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid var(--border);
+      background: rgba(90,122,74,0.08);
+      color: var(--moegi-pale);
+      border-radius: 1px;
+    }
+    .vocab-item strong {
+      color: var(--kincha); font-weight: 600;
+      margin-right: 0.4em;
+    }
+
+    /* ── 章タイトル区切り ── */
+    .chapter-divider {
+      display: flex; align-items: center; gap: 1.5rem;
+      margin: 4rem 0 2.5rem;
+      font-family: var(--font-en); font-size: 0.6rem;
+      letter-spacing: 0.5em; color: var(--moegi);
+      text-transform: uppercase;
+    }
+    .chapter-divider::before,
+    .chapter-divider::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(to right, transparent, var(--moegi-deep));
+    }
+    .chapter-divider::after {
+      background: linear-gradient(to left, transparent, var(--moegi-deep));
+    }
+    .chapter-divider:first-child { margin-top: 0; }
+
+    /* ── ページネーション風フッタ ── */
+    .content-footer {
+      margin-top: 3rem;
+      display: flex; justify-content: center;
+      gap: 1rem;
+    }
+    .btn-more {
+      display: inline-block;
+      padding: 0.7rem 2.5rem;
+      border: 1px solid var(--moegi);
+      color: var(--moegi-pale); font-size: 0.78rem;
+      letter-spacing: 0.4em; text-decoration: none;
+      transition: background 0.25s, color 0.25s;
+    }
+    .btn-more:hover { background: var(--moegi); color: var(--sumi); }
+
+    /* ── レスポンシブ ── */
+    @media (max-width: 860px) {
+      .main-wrap { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static; height: auto;
+        border-right: none; border-bottom: 1px solid var(--border);
+        padding: 1.5rem;
+        display: flex; flex-wrap: wrap; gap: 0.5rem;
+      }
+      .sidebar-section { padding: 0; margin: 0; }
+      .sidebar-label { display: none; }
+      .sidebar-link {
+        display: inline-block; padding: 0.3rem 0.7rem;
+        border: 1px solid var(--border); font-size: 0.72rem;
+      }
+      .sidebar-link:hover { padding-left: 0.7rem; }
+      header { padding: 0 1.2rem; }
+      nav { gap: 1rem; }
+      .page-header { padding: 3rem 1.5rem 2rem; flex-direction: column; gap: 1.5rem; }
+      .legend { align-items: flex-start; }
+      .content { padding: 2rem 1.5rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HEADER ══ -->
+  <header>
+    <a class="site-name" href="index.html">
+      平家物語<span>The Tale of the Heike</span>
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="translation.html" class="active">現代語訳</a>
+      <a href="blog.html">読み物</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+
+  <!-- ══ PAGE HEADER ══ -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <p class="page-en">Translation Log</p>
+      <h1 class="page-title">現代語訳</h1>
+      <p class="page-desc">原文・現代語訳・自分なりの解釈の順で掲載しています。<br>気になった章段から自由に読んでください。</p>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-bar lb-genbun"></span>原文</div>
+      <div class="legend-item"><span class="legend-bar lb-gendai"></span>現代語訳</div>
+      <div class="legend-item"><span class="legend-bar lb-kaishaku"></span>解釈・メモ</div>
+    </div>
+  </div>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main-wrap">
+
+    <!-- ── サイドバー ── -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <p class="sidebar-label">巻第一</p>
+        <a class="sidebar-link current" href="#gionshoja">
+          <span class="link-num">01</span>祇園精舎
+        </a>
+        <a class="sidebar-link" href="#giomae">
+          <span class="link-num">02</span>祇王
+        </a>
+      </div>
+      <div class="sidebar-section">
+        <p class="sidebar-label">巻第九</p>
+        <a class="sidebar-link" href="#atsumori">
+          <span class="link-num">03</span>敦盛の最期
+        </a>
+      </div>
+      <div class="sidebar-section">
+        <p class="sidebar-label">巻第十一</p>
+        <a class="sidebar-link" href="#nasu">
+          <span class="link-num">04</span>那須与一
+        </a>
+      </div>
+    </aside>
+
+    <!-- ── コンテンツ ── -->
+    <main class="content">
+
+      <!-- ━━ 巻第一 ━━ -->
+      <p class="chapter-divider">巻第一 · Book One</p>
+
+      <!-- ─ エントリー01: 祇園精舎 ─ -->
+      <article class="entry" id="gionshoja">
+        <div class="entry-header">
+          <span class="entry-num">巻第一 — 01</span>
+          <h2 class="entry-title">祇園精舎</h2>
+          <span class="entry-sub">Gion Shōja</span>
+          <time class="entry-date" datetime="2025-06-01">2025 · 06 · 01</time>
+        </div>
+
+        <!-- 原文 -->
+        <div class="block block-genbun">
+          <p class="block-label">原文</p>
+          <p class="block-body">
+            祇園精舎の鐘の声、諸行無常の響きあり。沙羅双樹の花の色、盛者必衰の理をあらはす。おごれる人も久しからず、ただ春の夜の夢のごとし。猛き者もつひには滅びぬ、ひとへに風の前の塵に同じ。
+          </p>
+        </div>
+
+        <!-- 現代語訳 -->
+        <div class="block block-gendai">
+          <p class="block-label">現代語訳</p>
+          <p class="block-body">
+            祇園精舎の鐘の音には、すべてのものは移り変わるという響きがある。沙羅双樹の花の色は、栄えた者も必ず衰えるという道理を表している。権勢をほこった者も長くは続かない、それはまるで春の夜の夢のようだ。勇猛な者も結局は滅んでしまう、それはまさに風の前の塵と同じことだ。
+          </p>
+        </div>
+
+        <!-- 解釈 -->
+        <div class="block block-kaishaku">
+          <p class="block-label">解釈・メモ</p>
+          <p class="block-body">
+            冒頭の四句がすごい。「鐘の声」「花の色」という感覚的なイメージから、いきなり「諸行無常」「盛者必衰」という仏教の真理に繋げる構成が鮮やか。<br><br>
+            「春の夜の夢」という比喩が特に好き。栄華の儚さを、春の短い夜に見る夢で表現している。平家の繁栄がいかに一時的なものだったかを予告しているようで、物語全体の通奏低音になっている感じがする。<br><br>
+            「猛き者もつひには滅びぬ」の「つひには」という副詞も重要。「いずれは」ではなく「最終的には」という不可避性を強調している。
+          </p>
+          <div class="vocab">
+            <span class="vocab-item"><strong>諸行無常</strong>すべての事物は移り変わる</span>
+            <span class="vocab-item"><strong>盛者必衰</strong>栄えた者は必ず衰える</span>
+            <span class="vocab-item"><strong>おごれる</strong>権勢をほこる・傲慢な</span>
+            <span class="vocab-item"><strong>猛き</strong>勇猛な・荒々しい</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- ─ エントリー02: 祇王 ─ -->
+      <article class="entry" id="giomae">
+        <div class="entry-header">
+          <span class="entry-num">巻第一 — 02</span>
+          <h2 class="entry-title">祇王</h2>
+          <span class="entry-sub">Giō</span>
+          <time class="entry-date" datetime="2025-06-08">2025 · 06 · 08</time>
+        </div>
+
+        <!-- 原文 -->
+        <div class="block block-genbun">
+          <p class="block-label">原文</p>
+          <p class="block-body">
+            祇王が白拍子なり。もとよりかやうの者は、遊びを業とせしかば、うたふも舞ふも我が心なるべきに、御所よりの仰せなれば、力及ばず参りたり。
+          </p>
+        </div>
+
+        <!-- 現代語訳 -->
+        <div class="block block-gendai">
+          <p class="block-label">現代語訳</p>
+          <p class="block-body">
+            祇王は白拍子（舞踊を行う女性芸能者）であった。もともとこういった立場の者は、芸を生業としているから、歌うも舞うも自分の意志でするべきところ、御所からのご命令なので、仕方なく参上したのだった。
+          </p>
+        </div>
+
+        <!-- 解釈 -->
+        <div class="block block-kaishaku">
+          <p class="block-label">解釈・メモ</p>
+          <p class="block-body">
+            「力及ばず参りたり」という一文が切ない。好きで来たわけじゃない、でも逆らえない――白拍子という職業の女性が置かれた社会的立場がにじみ出ている。<br><br>
+            清盛という権力者の前に、いかに個人の意志が無力かを静かに語っている場面。声高に批判するわけでもなく、ただ「力及ばず」の一言に圧縮されているのがいい。平家物語の語りのうまさを感じる。
+          </p>
+          <div class="vocab">
+            <span class="vocab-item"><strong>白拍子</strong>平安〜鎌倉の女性芸能者</span>
+            <span class="vocab-item"><strong>業とせし</strong>生業・仕事とする</span>
+            <span class="vocab-item"><strong>力及ばず</strong>どうしようもなく・仕方なく</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- ━━ 巻第九 ━━ -->
+      <p class="chapter-divider">巻第九 · Book Nine</p>
+
+      <!-- ─ エントリー03: 敦盛の最期 ─ -->
+      <article class="entry" id="atsumori">
+        <div class="entry-header">
+          <span class="entry-num">巻第九 — 16</span>
+          <h2 class="entry-title">敦盛の最期</h2>
+          <span class="entry-sub">The Death of Atsumori</span>
+          <time class="entry-date" datetime="2025-05-25">2025 · 05 · 25</time>
+        </div>
+
+        <!-- 原文 -->
+        <div class="block block-genbun">
+          <p class="block-label">原文</p>
+          <p class="block-body">
+            「そもそもいかなる人にてましますぞ。名のらせたまへ、助けたてまつらん」と申しければ、「汝はたそ」ととひたまふ。「物その者は候はず。熊谷次郎直実」と申す。「さては汝にあうては名のるまじいぞ。汝がためにはよい敵ぞ。名のらずとも首をとれ、見知らんずるぞ」とぞのたまひける。
+          </p>
+        </div>
+
+        <!-- 現代語訳 -->
+        <div class="block block-gendai">
+          <p class="block-label">現代語訳</p>
+          <p class="block-body">
+            「そもそもどのようなお方でいらっしゃいますか。名乗ってください、お助けいたします」と申し上げると、「お前は誰か」とお尋ねになる。「たいした者ではありませんが、熊谷次郎直実と申します」と言う。「では、お前には名乗るまい。お前にとっては良い敵だぞ。名乗らなくても首を取れ、見知ってもらえるだろう」とおっしゃった。
+          </p>
+        </div>
+
+        <!-- 解釈 -->
+        <div class="block block-kaishaku">
+          <p class="block-label">解釈・メモ</p>
+          <p class="block-body">
+            敦盛のセリフがかっこよすぎる。「さては汝にあうては名のるまじいぞ」――名乗るに値しない相手だと言いつつ、それが侮辱ではなく、むしろ自分の高貴さを静かに示している。<br><br>
+            「汝がためにはよい敵ぞ」という言葉の複雑さ。直実にとっては「自分を討てば名誉になる良い相手だ」という意味だが、読んでいると、敦盛自身が自分の死を受け入れている声に聞こえる。十六歳という年齢を知る読者にとって、この台詞は余計に重い。
+          </p>
+          <div class="vocab">
+            <span class="vocab-item"><strong>ましますぞ</strong>いらっしゃるのか（尊敬語）</span>
+            <span class="vocab-item"><strong>物その者は候はず</strong>たいした者ではない（謙遜）</span>
+            <span class="vocab-item"><strong>見知らんずるぞ</strong>見て分かるだろう</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- ━━ 巻第十一 ━━ -->
+      <p class="chapter-divider">巻第十一 · Book Eleven</p>
+
+      <!-- ─ エントリー04: 那須与一 ─ -->
+      <article class="entry" id="nasu">
+        <div class="entry-header">
+          <span class="entry-num">巻第十一 — 04</span>
+          <h2 class="entry-title">那須与一</h2>
+          <span class="entry-sub">Nasu no Yoichi</span>
+          <time class="entry-date" datetime="2025-05-10">2025 · 05 · 10</time>
+        </div>
+
+        <!-- 原文 -->
+        <div class="block block-genbun">
+          <p class="block-label">原文</p>
+          <p class="block-body">
+            与一目をふさいで、「南無八幡大菩薩、われ国の神明、日光の権現、宇都宮、那須の湯泉大明神、願はくは、あの扇の真中射させてたばせたまへ。これを射損ずるものならば、弓切り折り自害して、人に二度面を向かふべからず。いま一度本国へ迎へたまへ」と心のうちに祈念して、目を見開いたれば、風も少し吹き弱り、扇も射よげにぞなつたりける。
+          </p>
+        </div>
+
+        <!-- 現代語訳 -->
+        <div class="block block-gendai">
+          <p class="block-label">現代語訳</p>
+          <p class="block-body">
+            与一は目を閉じて、「南無八幡大菩薩、わが国の神々よ、日光権現、宇都宮、那須の湯泉大明神よ、どうかあの扇の真ん中を射させてください。もしこれを射損じるならば、弓を切り折って自害し、二度と人に顔を向けることはしません。もう一度故郷へ帰らせてください」と心の中で祈り、目を開けると、風も少し弱まり、扇も射やすくなっていた。
+          </p>
+        </div>
+
+        <!-- 解釈 -->
+        <div class="block block-kaishaku">
+          <p class="block-label">解釈・メモ</p>
+          <p class="block-body">
+            祈りの言葉の構造が面白い。まず神仏に呼びかけ、次に「射損じたら自害する」という覚悟を誓い、最後に「故郷へ帰らせて」と願う。この順序が与一の心理をよく表している――使命感、武士としての矜持、そして何よりも生きて帰りたいという人間の本音。<br><br>
+            「風も少し吹き弱り」という自然の応答が神秘的。与一の祈りが通じたような描写で、神仏との感応という平安〜鎌倉的な世界観が色濃く出ている。扇が「射よげ」になったというのも、単に好条件になったというより、世界が与一に味方したイメージ。
+          </p>
+          <div class="vocab">
+            <span class="vocab-item"><strong>南無</strong>帰依します（仏教の礼拝語）</span>
+            <span class="vocab-item"><strong>たばせたまへ</strong>〜させてください（依頼）</span>
+            <span class="vocab-item"><strong>射よげ</strong>射やすい・射るのに適した</span>
+            <span class="vocab-item"><strong>祈念して</strong>心を込めて祈って</span>
+          </div>
+        </div>
+      </article>
+
+      <div class="content-footer">
+        <a class="btn-more" href="#">続きの章段を準備中…</a>
+      </div>
+
+    </main>
+  </div><!-- /main-wrap -->
+
+  <!-- ══ FOOTER ══ -->
+  <footer style="position:relative;z-index:1;padding:2.5rem 5rem;border-top:1px solid rgba(90,122,74,0.3);display:flex;justify-content:space-between;align-items:center;background:rgba(15,22,12,0.8);font-family:var(--font-jp);">
+    <p style="font-size:0.95rem;font-weight:600;letter-spacing:0.3em;color:var(--moegi-pale);">平家物語 現代語訳サイト</p>
+    <nav style="display:flex;gap:1.8rem;">
+      <a href="index.html" style="font-size:0.72rem;letter-spacing:0.2em;color:rgba(90,122,74,0.7);text-decoration:none;">Home</a>
+      <a href="translation.html" style="font-size:0.72rem;letter-spacing:0.2em;color:var(--kincha);text-decoration:none;">現代語訳</a>
+      <a href="blog.html" style="font-size:0.72rem;letter-spacing:0.2em;color:rgba(90,122,74,0.7);text-decoration:none;">読み物</a>
+      <a href="about.html" style="font-size:0.72rem;letter-spacing:0.2em;color:rgba(90,122,74,0.7);text-decoration:none;">About</a>
+    </nav>
+    <p style="font-size:0.7rem;letter-spacing:0.2em;color:rgba(90,122,74,0.4);font-family:var(--font-en);">&copy; 2025 Heike Monogatari Study Site</p>
+  </footer>
+
+  <script>
+    // サイドバーのアクティブリンクをスクロールに合わせて更新
+    const entries = document.querySelectorAll('.entry');
+    const links   = document.querySelectorAll('.sidebar-link');
+
+    const observer = new IntersectionObserver((records) => {
+      records.forEach(r => {
+        if (r.isIntersecting) {
+          links.forEach(l => l.classList.remove('current'));
+          const match = document.querySelector(`.sidebar-link[href="#${r.target.id}"]`);
+          if (match) match.classList.add('current');
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+
+    entries.forEach(e => observer.observe(e));
+  </script>
+</body>
+</html>
